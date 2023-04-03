@@ -11,14 +11,15 @@ logger.Info("Program started");
 string choice = "";
 try
 {
+    Console.ForegroundColor = ConsoleColor.Green;
+
     // Ask which type of item to display
     Console.WriteLine("Select an activity:\n1) Display all blogs\n2) Add Blog\n3) Create Post\n4) Display Posts");
 
     // input selection
     choice = Console.ReadLine();
     logger.Info("User choice: {choice}\n", choice);
-    Console.ForegroundColor = ConsoleColor.Green;
-
+    
     switch(choice){
         case "1":       //Display all blogs
         // Display all Blogs from the database
@@ -47,7 +48,33 @@ try
         break;
 
         case "3":       //Create post
+        // Determine which blog in which to create the post
+        db = new BloggingContext();
+        query = db.Blogs.OrderBy(b => b.BlogId);
+        Console.WriteLine("Select the blog in which you would like to post:");
+        foreach (var item in query)
+        {
+            Console.Write(item.BlogId);
+            Console.WriteLine(" - " + item.Name);
+        }
 
+        //create an instance of Post
+        var newPost = new Post();
+
+        // input selection
+        newPost.BlogId = Convert.ToInt32(Console.ReadLine());  //want this to be the BlogID
+        logger.Info("User choice: {choice}\n", choice);
+
+        Console.Write("Enter name of post>>  ");
+        newPost.Title = Console.ReadLine();
+        Console.WriteLine("Enter content of post>>  ");
+        newPost.Content = Console.ReadLine();
+        
+        db.AddPost(newPost);
+        logger.Info("Post added - {title}", newPost.Title);
+
+
+        Console.ForegroundColor = ConsoleColor.Black; 
         break;
 
         case "4":       //Display post
