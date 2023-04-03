@@ -22,64 +22,80 @@ try
     
     switch(choice){
         case "1":       //Display all blogs
-        // Display all Blogs from the database
-        var db = new BloggingContext();
-        var query = db.Blogs.OrderBy(b => b.Name);
+            // Display all Blogs from the database
+            var db = new BloggingContext();
+            var query = db.Blogs.OrderBy(b => b.Name);
 
-        Console.WriteLine("All blogs in the database:");
-        foreach (var item in query)
-        {
-            Console.WriteLine(item.Name);
-        }
-        Console.ForegroundColor = ConsoleColor.Black;        
-        break;
+            Console.WriteLine("All blogs in the database:");
+            foreach (var item in query)
+            {
+                Console.WriteLine(item.Name);
+            }
+            Console.ForegroundColor = ConsoleColor.Black;        
+            break;
 
         case "2":       //Add blog
-        // Create and save a new Blog
-        Console.Write("Enter a name for a new Blog: ");
-        var name = Console.ReadLine();
+            // Create and save a new Blog
+            Console.Write("Enter a name for a new Blog: ");
+            var name = Console.ReadLine();
+            // create an instance of Blog class
+            var blog = new Blog { Name = name };
 
-        var blog = new Blog { Name = name };
-
-        db = new BloggingContext();
-        db.AddBlog(blog);
-        logger.Info("Blog added - {name}", name);
-        Console.ForegroundColor = ConsoleColor.Black; 
-        break;
+            db = new BloggingContext();
+            db.AddBlog(blog);
+            logger.Info("Blog added - {name}", name);
+            Console.ForegroundColor = ConsoleColor.Black; 
+            break;
 
         case "3":       //Create post
-        // Determine which blog in which to create the post
-        db = new BloggingContext();
-        query = db.Blogs.OrderBy(b => b.BlogId);
-        Console.WriteLine("Select the blog in which you would like to post:");
-        foreach (var item in query)
-        {
-            Console.Write(item.BlogId);
-            Console.WriteLine(" - " + item.Name);
-        }
+            // Determine which blog in which to create the post
+            db = new BloggingContext();
+            query = db.Blogs.OrderBy(b => b.BlogId);
+            Console.WriteLine("Select the blog in which you would like to post:");
+            foreach (var item in query)
+            {
+                Console.WriteLine(item.BlogId + " - " + item.Name);
+            }
 
-        //create an instance of Post
-        var newPost = new Post();
+            //create an instance of Post
+            var newPost = new Post();
 
-        // input selection
-        newPost.BlogId = Convert.ToInt32(Console.ReadLine());  //want this to be the BlogID
-        logger.Info("User choice: {choice}\n", choice);
+            // input selection
+            newPost.BlogId = Convert.ToInt32(Console.ReadLine());
+            
+            Console.Write("Enter name of post>>  ");
+            newPost.Title = Console.ReadLine();
+            Console.WriteLine("Enter content of post>>  ");
+            newPost.Content = Console.ReadLine();
+            
+            db.AddPost(newPost);
+            logger.Info("Post added - {title}", newPost.Title);
 
-        Console.Write("Enter name of post>>  ");
-        newPost.Title = Console.ReadLine();
-        Console.WriteLine("Enter content of post>>  ");
-        newPost.Content = Console.ReadLine();
-        
-        db.AddPost(newPost);
-        logger.Info("Post added - {title}", newPost.Title);
-
-
-        Console.ForegroundColor = ConsoleColor.Black; 
-        break;
+            Console.ForegroundColor = ConsoleColor.Black; 
+            break;
 
         case "4":       //Display post
+            // Determine which blog to list all posts
+            db = new BloggingContext();
+            query = db.Blogs.OrderBy(b => b.BlogId);
+            Console.WriteLine("Select the blog to display all posts:");
+            foreach (var item in query)
+            {
+                Console.WriteLine(item.BlogId + " - " + item.Name);
+            }
 
-        break;
+            var subChoice = Convert.ToInt32(Console.ReadLine());
+            var postsToDisplay = db.Posts.Where(p => p.BlogId == subChoice);
+
+            Console.WriteLine($"\nThere are {postsToDisplay.Count()} Posts in this blog:");
+            foreach (var item in postsToDisplay)
+            {
+                Console.WriteLine("Blog Name:  " + item.Blog.Name + "\tPost Title:  " + item.Title + "\t\tPost Content:  " + item.Content);
+
+            }
+
+            Console.ForegroundColor = ConsoleColor.Black;
+            break;
     }
 
 
