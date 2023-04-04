@@ -27,7 +27,7 @@ try
                 var db = new BloggingContext();
                 var query = db.Blogs.OrderBy(b => b.Name);
 
-                Console.WriteLine("All blogs in the database:");
+                Console.WriteLine($"There are {query.Count()} blogs in the database:",query.Count());
                 foreach (var item in query)
                 {
                     Console.WriteLine(item.Name);
@@ -40,6 +40,14 @@ try
                 // Create and save a new Blog
                 Console.Write("Enter a name for a new Blog: ");
                 var name = Console.ReadLine();
+
+                // check for no name entered
+                if(name == ""){
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    logger.Error("Blog name cannot be null");
+                    break;
+                }
+
                 // create an instance of Blog class
                 var blog = new Blog { Name = name };
 
@@ -68,7 +76,7 @@ try
                 newPost.BlogId = Convert.ToInt32(Console.ReadLine());
                     logger.Info("User choice: {newPost.BlogId}\n", newPost.BlogId);
 
-                // check if user selection is valid
+                // check if user blog selection is valid
                 try
                 {
                     if(newPost.BlogId < 1 || newPost.BlogId > query.Count()){
@@ -86,8 +94,16 @@ try
                 }
 
 
-                Console.Write("Enter name of post >>  ");
+                Console.Write("Enter title of post >>  ");
                 newPost.Title = Console.ReadLine();
+                
+                // check for no title entered
+                if(newPost.Title == ""){
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    logger.Error("Post Title cannot be null");
+                    break;
+                }
+                
                 Console.Write("Enter content of post >>  ");
                 newPost.Content = Console.ReadLine();
                 
@@ -102,10 +118,10 @@ try
                 // Determine which blog to list all posts
                 db = new BloggingContext();
                 query = db.Blogs.OrderBy(b => b.BlogId);
-                Console.WriteLine("Select the blog to display all posts:");
+                Console.WriteLine("Select the blog's posts to display:\n0 - Posts from all Blogs");
                 foreach (var item in query)
                 {
-                    Console.WriteLine(item.BlogId + " - " + item.Name);
+                    Console.WriteLine(item.BlogId + " - Posts from the Blog " + item.Name);
                 }
 
                 var subChoice = Convert.ToInt32(Console.ReadLine());
@@ -114,7 +130,7 @@ try
                 // check if user selection is valid
                 try
                 {
-                    if(subChoice < 1 || subChoice > query.Count()){
+                    if(subChoice < 0 || subChoice > query.Count()){
                         throw new ArgumentOutOfRangeException($" Entry of {subChoice} is outside selection range");
                     }
                 }
@@ -128,12 +144,23 @@ try
                     break;
                 }
                 
-                var postsToDisplay = db.Posts.Where(p => p.BlogId == subChoice);
+                // display posts from all blogs or display posts in one selected blog
+                if(subChoice == 0){
+                    var postsToDisplay = db.Posts;
 
-                Console.WriteLine($"\nThere are {postsToDisplay.Count()} Posts in this blog:");
-                foreach (var item in postsToDisplay)
-                {
-                    Console.WriteLine("Blog Name:  " + item.Blog.Name + "\tPost Title:  " + item.Title + "\t\tPost Content:  " + item.Content);
+                    Console.WriteLine($"\n{postsToDisplay.Count()} post(s) returned:");
+                    foreach (var item in postsToDisplay)
+                    {
+                        Console.WriteLine("{0,-30}{1,-40}{2,-80}","Blog Name:  " + item.Blog.Name,"Post Title:  "+ item.Title,"Post Content:  " + item.Content);
+                    }
+                }else{
+                    var postsToDisplay = db.Posts.Where(p => p.BlogId == subChoice);
+
+                    Console.WriteLine($"\n{postsToDisplay.Count()} post(s) returned:");
+                    foreach (var item in postsToDisplay)
+                    {
+                        Console.WriteLine("{0,-30}{1,-40}{2,-80}","Blog Name:  " + item.Blog.Name,"Post Title:  "+ item.Title,"Post Content:  " + item.Content);
+                    }
 
                 }
                 Console.WriteLine();
