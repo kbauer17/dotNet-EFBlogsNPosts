@@ -14,7 +14,7 @@ try
     Console.ForegroundColor = ConsoleColor.Green;
 
     // Ask which type of item to display
-    Console.WriteLine("Select an activity:\n1) Display all blogs\n2) Add Blog\n3) Create Post\n4) Display Posts");
+    Console.WriteLine("\nSelect an activity:\n1) Display all blogs\n2) Add Blog\n3) Create Post\n4) Display Posts");
 
     // input selection
     choice = Console.ReadLine();
@@ -31,6 +31,7 @@ try
             {
                 Console.WriteLine(item.Name);
             }
+            Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Black;        
             break;
 
@@ -44,6 +45,8 @@ try
             db = new BloggingContext();
             db.AddBlog(blog);
             logger.Info("Blog added - {name}", name);
+            Console.WriteLine();
+
             Console.ForegroundColor = ConsoleColor.Black; 
             break;
 
@@ -62,14 +65,16 @@ try
 
             // input selection
             newPost.BlogId = Convert.ToInt32(Console.ReadLine());
+            logger.Info("User choice: {newPost.BlogId}\n", newPost.BlogId);
             
-            Console.Write("Enter name of post>>  ");
+            Console.Write("Enter name of post >>  ");
             newPost.Title = Console.ReadLine();
-            Console.WriteLine("Enter content of post>>  ");
+            Console.Write("Enter content of post >>  ");
             newPost.Content = Console.ReadLine();
             
             db.AddPost(newPost);
             logger.Info("Post added - {title}", newPost.Title);
+            Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Black; 
             break;
@@ -85,6 +90,7 @@ try
             }
 
             var subChoice = Convert.ToInt32(Console.ReadLine());
+            logger.Info("User choice: {subChoice}\n", subChoice);
             var postsToDisplay = db.Posts.Where(p => p.BlogId == subChoice);
 
             Console.WriteLine($"\nThere are {postsToDisplay.Count()} Posts in this blog:");
@@ -93,32 +99,11 @@ try
                 Console.WriteLine("Blog Name:  " + item.Blog.Name + "\tPost Title:  " + item.Title + "\t\tPost Content:  " + item.Content);
 
             }
-
+            Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Black;
             break;
     }
 
-
-
-
-    // Create and save a new Blog
-    /*Console.Write("Enter a name for a new Blog: ");
-    name = Console.ReadLine();
-
-    var blog = new Blog { Name = name };
-
-    var db = new BloggingContext();
-    db.AddBlog(blog);
-    logger.Info("Blog added - {name}", name);
-
-    // Display all Blogs from the database
-    var query = db.Blogs.OrderBy(b => b.Name);
-
-    Console.WriteLine("All blogs in the database:");
-    foreach (var item in query)
-    {
-        Console.WriteLine(item.Name);
-    }*/
 }
 catch (Exception ex)
 {
