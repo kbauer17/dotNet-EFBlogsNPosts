@@ -18,7 +18,7 @@ try
 
     // input selection
     choice = Console.ReadLine();
-    logger.Info("User choice: {choice}\n", choice);
+        logger.Info("User choice: {choice}\n", choice);
     
     switch(choice){
         case "1":       //Display all blogs
@@ -44,7 +44,7 @@ try
 
             db = new BloggingContext();
             db.AddBlog(blog);
-            logger.Info("Blog added - {name}", name);
+                logger.Info("Blog added - {name}", name);
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Black; 
@@ -65,15 +65,33 @@ try
 
             // input selection
             newPost.BlogId = Convert.ToInt32(Console.ReadLine());
-            logger.Info("User choice: {newPost.BlogId}\n", newPost.BlogId);
-            
+                logger.Info("User choice: {newPost.BlogId}\n", newPost.BlogId);
+
+            // check if user selection is valid
+            try
+            {
+                if(newPost.BlogId < 1 || newPost.BlogId > query.Count()){
+                    throw new ArgumentOutOfRangeException($" Entry of {newPost.BlogId} is outside selection range");
+                }
+            }
+            catch(ArgumentOutOfRangeException arg)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                    logger.Error(arg.Message);
+                Console.WriteLine($"Error: {arg.Message}\nProgram will exit");
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Black; 
+                break;
+            }
+
+
             Console.Write("Enter name of post >>  ");
             newPost.Title = Console.ReadLine();
             Console.Write("Enter content of post >>  ");
             newPost.Content = Console.ReadLine();
             
             db.AddPost(newPost);
-            logger.Info("Post added - {title}", newPost.Title);
+                logger.Info("Post added - {title}", newPost.Title);
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Black; 
@@ -90,7 +108,25 @@ try
             }
 
             var subChoice = Convert.ToInt32(Console.ReadLine());
-            logger.Info("User choice: {subChoice}\n", subChoice);
+                logger.Info("User choice: {subChoice}\n", subChoice);
+
+            // check if user selection is valid
+            try
+            {
+                if(subChoice < 1 || subChoice > query.Count()){
+                    throw new ArgumentOutOfRangeException($" Entry of {subChoice} is outside selection range");
+                }
+            }
+            catch(ArgumentOutOfRangeException arg)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                    logger.Error(arg.Message);
+                Console.WriteLine($"Error: {arg.Message}\nProgram will exit");
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Black; 
+                break;
+            }
+            
             var postsToDisplay = db.Posts.Where(p => p.BlogId == subChoice);
 
             Console.WriteLine($"\nThere are {postsToDisplay.Count()} Posts in this blog:");
@@ -102,12 +138,21 @@ try
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Black;
             break;
+        default:
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid input detected.  Program will exit.\n");
+            Console.ForegroundColor = ConsoleColor.Black;
+            break;
     }
 
 }
 catch (Exception ex)
 {
-    logger.Error(ex.Message);
+    Console.ForegroundColor = ConsoleColor.DarkRed;
+    Console.WriteLine("Invalid input detected.  Program will exit.");
+        logger.Error(ex.Message);
+    Console.ForegroundColor = ConsoleColor.Black;
+    Console.WriteLine();
 }
 
 logger.Info("Program ended");
